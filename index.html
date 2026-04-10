@@ -3,39 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>MSBR & MSIC Explorer</title>
+  <title>Explorer MSBR & MSIC</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    /* ... (Keep your existing CSS from the previous design here) ... */
-    :root { --primary: #3b82f6; --bg: #0f172a; --card-bg: rgba(255, 255, 255, 0.9); --text-main: #1e293b; --text-muted: #64748b; --radius: 20px; }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: sans-serif; color: var(--text-main); background: var(--bg); display: flex; justify-content: center; padding: 16px; min-height: 100vh; }
-    .shell { width: 100%; max-width: 1100px; }
-    header h1 { color: white; margin: 0; }
-    header p { color: rgba(255,255,255,0.6); }
-    .tab-container { display: flex; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 14px; margin: 16px 0; }
-    .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: white; cursor: pointer; border-radius: 10px; font-weight: 600; }
-    .tab-btn.active { background: var(--primary); }
-    .card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
-    .search-area { padding: 20px; background: white; border-bottom: 1px solid #eee; }
-    input#q { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; outline: none; }
-    .status-bar { display: flex; justify-content: space-between; padding: 10px 20px; background: #f8fafc; font-size: 12px; }
-    #results { flex: 1; overflow: auto; max-height: 60vh; min-height: 300px; }
-    .data-card { padding: 15px; border-bottom: 1px solid #eee; background: white; }
-    .card-title { color: var(--primary); font-weight: 700; display: block; margin-bottom: 5px; }
-    .card-label { font-size: 10px; color: var(--text-muted); font-weight: 700; }
-    .card-val { font-size: 13px; margin-bottom: 5px; }
-    .pager { display: flex; justify-content: space-between; padding: 16px; background: white; align-items: center; }
-    .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; }
-    .spinner { width: 18px; height: 18px; border: 3px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (min-width: 768px) {
-      table { width: 100%; border-collapse: collapse; }
-      th { position: sticky; top: 0; background: #f8fafc; padding: 12px; text-align: left; font-size: 11px; border-bottom: 1px solid #eee; }
-      td { padding: 12px; font-size: 13px; border-bottom: 1px solid #eee; background: white; }
-      .data-card { display: none; }
+    :root {
+      --primary: #3b82f6;
+      --bg: #0f172a;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #1e293b;
+      --text-muted: #64748b;
     }
-    @media (max-width: 767px) { table { display: none; } }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      display: flex; justify-content: center; min-height: 100vh;
+    }
+
+    .shell { width: 100%; max-width: 800px; padding: 12px; display: flex; flex-direction: column; }
+
+    header h1 { color: white; font-size: 22px; margin: 10px 0 0; }
+    header p { color: rgba(255,255,255,0.5); font-size: 13px; margin: 4px 0 15px; }
+
+    /* --- Tabs (Sticky for Mobile) --- */
+    .tab-container {
+      display: flex; background: rgba(255, 255, 255, 0.1); padding: 4px; border-radius: 12px; margin-bottom: 12px;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px; border: none; background: transparent; color: white;
+      font-weight: 600; font-size: 13px; border-radius: 8px; transition: 0.2s;
+    }
+    .tab-btn.active { background: var(--primary); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+
+    /* --- Search Area --- */
+    .main-card {
+      background: var(--card-bg); border-radius: 16px; display: flex; flex-direction: column;
+      flex: 1; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .search-box { padding: 15px; border-bottom: 1px solid #eee; background: white; }
+    input#q {
+      width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid #ddd;
+      font-size: 16px; outline: none; appearance: none;
+    }
+
+    .status-bar {
+      display: flex; justify-content: space-between; padding: 8px 15px;
+      background: #f8fafc; font-size: 11px; font-weight: 700; color: var(--text-muted);
+    }
+
+    /* --- Results (Scrollable Area) --- */
+    #results { flex: 1; overflow-y: auto; background: #f1f5f9; }
+
+    /* Mobile Card Layout */
+    .data-item {
+      background: white; margin: 8px; padding: 15px; border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .item-title { color: var(--primary); font-weight: 800; font-size: 14px; margin-bottom: 8px; display: block; line-height: 1.3; }
+    .item-row { display: flex; margin-bottom: 4px; font-size: 12px; }
+    .item-label { width: 80px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+    .item-val { color: var(--text-main); }
+
+    /* --- Footer Pagination --- */
+    .pager {
+      padding: 12px; display: flex; justify-content: space-between; align-items: center;
+      background: white; border-top: 1px solid #eee;
+    }
+    .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: white; font-size: 13px; font-weight: 600; }
+    .btn:disabled { opacity: 0.3; }
+
+    .loader-spin {
+      width: 14px; height: 14px; border: 2px solid #ddd; border-top-color: var(--primary);
+      border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; margin-right: 5px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Desktop Adjustments */
+    @media (min-width: 768px) {
+      .shell { padding: 40px 20px; }
+      .data-item { margin: 10px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -43,35 +94,37 @@
 <div class="shell">
   <header>
     <h1>Carian MSBR & MSIC</h1>
-    <p>DOSM Negeri Sembilan (Serverless Version)</p>
+    <p>DOSM Negeri Sembilan</p>
   </header>
 
   <div class="tab-container">
-    <button id="tab-msbr" class="tab-btn active" onclick="switchTab('msbr')">MSBR</button>
-    <button id="tab-msic" class="tab-btn" onclick="switchTab('msic')">MSIC</button>
+    <button id="btn-msbr" class="tab-btn active" onclick="switchTab('msbr')">MSBR</button>
+    <button id="btn-msic" class="tab-btn" onclick="switchTab('msic')">MSIC</button>
   </div>
 
-  <div class="card">
-    <div class="search-area">
-      <input type="text" id="q" placeholder="Sila tunggu, memuatkan data..." disabled autocomplete="off">
+  <div class="main-card">
+    <div class="search-box">
+      <input type="text" id="q" placeholder="Memuatkan data..." disabled autocomplete="off">
     </div>
 
     <div class="status-bar">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div class="spinner" id="loader"></div>
-        <span id="statusTxt">Memuatkan CSV...</span>
-      </div>
-      <span id="countTxt">0 results</span>
+      <span>
+        <span id="loadIcon" class="loader-spin"></span>
+        <span id="statusTxt">Loading CSV...</span>
+      </span>
+      <span id="countTxt">0 rekod</span>
     </div>
 
     <div id="results">
-      <div style="padding: 60px 20px; text-align: center; color: var(--text-muted);">Sila tunggu sehingga data selesai dimuatkan.</div>
+      <div style="padding:40px; text-align:center; color:var(--text-muted); font-size:14px;">
+        Sila tunggu sebentar...
+      </div>
     </div>
 
     <div class="pager">
-      <button id="prevBtn" class="btn" disabled>← Prev</button>
-      <span id="pageTxt" style="font-size: 12px; font-weight:700;">Page 1</span>
-      <button id="nextBtn" class="btn" disabled>Next →</button>
+      <button id="prevBtn" class="btn" disabled>Sebelum</button>
+      <span id="pageTxt" style="font-size:12px; font-weight:700;">Halaman 1</span>
+      <button id="nextBtn" class="btn" disabled>Seterusnya</button>
     </div>
   </div>
 </div>
@@ -80,37 +133,39 @@
   let activeTab = 'msbr';
   let offset = 0;
   const limit = 20;
-  
-  // Storage for the full datasets
   let datasets = { msbr: null, msic: null };
-  let filteredData = [];
+  let filtered = [];
 
   const input = document.getElementById('q');
   const resultsEl = document.getElementById('results');
-  const loader = document.getElementById('loader');
   const statusTxt = document.getElementById('statusTxt');
   const countTxt = document.getElementById('countTxt');
+  const loadIcon = document.getElementById('loadIcon');
 
-  // 1. Initial Load: Fetch CSVs immediately
+  // Load Data Files
   window.onload = () => {
-    loadCSV('msbr', 'newMSBR.csv');
-    loadCSV('msic', 'MSIC2008_2025.csv');
+    loadData('msbr', 'newMSBR.csv');
+    loadData('msic', 'MSIC2008_2025.csv');
   };
 
-  function loadCSV(type, filename) {
-    Papa.parse(filename, {
+  function loadData(type, file) {
+    Papa.parse(file, {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: function(results) {
-        datasets[type] = results;
-        if (type === activeTab) {
-          input.disabled = false;
-          input.placeholder = "Carian Nama / No. Siri...";
-          statusTxt.textContent = "Data sedia.";
-        }
+      complete: (res) => {
+        datasets[type] = res.data;
+        if (type === activeTab) enableSearch();
       }
     });
+  }
+
+  function enableSearch() {
+    input.disabled = false;
+    input.placeholder = activeTab === 'msbr' ? "Cari Nama / No. Siri..." : "Cari Kod / Deskripsi...";
+    statusTxt.textContent = "Data Sedia";
+    loadIcon.style.display = 'none';
+    resultsEl.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-muted);">Sila masukkan sekurang-kurangnya 2 aksara.</div>`;
   }
 
   function switchTab(tab) {
@@ -120,93 +175,77 @@
     input.value = "";
     
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-'+tab).classList.add('active');
+    document.getElementById('btn-'+tab).classList.add('active');
     
     // Reset View
-    resultsEl.innerHTML = `<div style="padding: 60px 20px; text-align: center; color: var(--text-muted);">Masukkan carian baru untuk ${tab.toUpperCase()}.</div>`;
-    statusTxt.textContent = "Data sedia.";
-    countTxt.textContent = "0 results";
+    resultsEl.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-muted);">Masukkan carian untuk ${tab.toUpperCase()}</div>`;
+    countTxt.textContent = "0 rekod";
     updatePager(0);
+    enableSearch();
   }
 
   input.addEventListener('input', () => {
-    offset = 0;
-    runSearch();
-  });
-
-  function runSearch() {
     const q = input.value.trim().toLowerCase();
-    const data = datasets[activeTab];
-
-    if (!data) return;
+    offset = 0;
+    
     if (q.length < 2) {
-      filteredData = [];
-      renderUI();
+      filtered = [];
+      render();
       return;
     }
 
-    loader.style.display = 'block';
+    const data = datasets[activeTab];
+    if (!data) return;
 
-    // Perform Search in Browser
-    filteredData = data.data.filter(row => {
-      return Object.values(row).some(val => 
-        String(val).toLowerCase().includes(q)
-      );
+    // Fast Filter
+    filtered = data.filter(row => {
+      return Object.values(row).some(v => String(v).toLowerCase().includes(q));
     });
 
-    renderUI();
-    loader.style.display = 'none';
-  }
+    render();
+  });
 
-  function renderUI() {
-    const total = filteredData.length;
-    countTxt.textContent = `${total} results`;
+  function render() {
+    const total = filtered.length;
+    countTxt.textContent = `${total} rekod`;
     
     if (total === 0) {
-      resultsEl.innerHTML = '<div style="padding:60px; text-align:center;">Tiada rekod dijumpai.</div>';
+      resultsEl.innerHTML = `<div style="padding:40px; text-align:center;">Tiada hasil dijumpai.</div>`;
       updatePager(0);
       return;
     }
 
-    const rowsToShow = filteredData.slice(offset, offset + limit);
-    const headers = Object.keys(filteredData[0]);
+    const chunk = filtered.slice(offset, offset + limit);
+    let html = '';
 
-    let cardHtml = '';
-    let tableHtml = '<table><thead><tr>';
-    headers.forEach(h => tableHtml += `<th>${h}</th>`);
-    tableHtml += '</tr></thead><tbody>';
-
-    rowsToShow.forEach(row => {
-      tableHtml += '<tr>';
-      headers.forEach(h => tableHtml += `<td>${row[h] || '-'}</td>`);
-      tableHtml += '</tr>';
-
-      // Mobile Card Mapping
-      cardHtml += `<div class="data-card">`;
+    chunk.forEach(row => {
+      html += `<div class="data-item">`;
       if (activeTab === 'msbr') {
-        cardHtml += `<span class="card-title">${row['Nama Pendaftaran'] || 'Tiada Nama'}</span>`;
-        cardHtml += `<div class="card-label">No. Siri</div><div class="card-val">${row['No. Siri']}</div>`;
-        cardHtml += `<div class="card-label">Daerah</div><div class="card-val">${row['Daerah Pentadbiran Tahunan'] || '-'}</div>`;
+        html += `<span class="item-title">${row['Nama Pendaftaran'] || 'TIADA NAMA'}</span>`;
+        html += `<div class="item-row"><span class="item-label">No. Siri</span><span class="item-val">${row['No. Siri']}</span></div>`;
+        html += `<div class="item-row"><span class="item-label">Perniagaan</span><span class="item-val">${row['Nama Perniagaan'] || '-'}</span></div>`;
+        html += `<div class="item-row"><span class="item-label">Daerah</span><span class="item-val">${row['Daerah Pentadbiran Tahunan'] || '-'}</span></div>`;
       } else {
-        cardHtml += `<span class="card-title">${row['MSIC 2025'] || row['MSIC 2008']}</span>`;
-        cardHtml += `<div class="card-label">Malay</div><div class="card-val">${row['MALAY DESCRIPTION FOR MSIC 2025'] || '-'}</div>`;
+        html += `<span class="item-title">${row['MSIC 2025'] || row['MSIC 2008']}</span>`;
+        html += `<div class="item-row"><span class="item-label">Malay</span><span class="item-val">${row['MALAY DESCRIPTION FOR MSIC 2025'] || '-'}</span></div>`;
+        html += `<div class="item-row"><span class="item-label">English</span><span class="item-val">${row['ENGLISH DESCRIPTION FOR MSIC 2025'] || '-'}</span></div>`;
       }
-      cardHtml += `</div>`;
+      html += `</div>`;
     });
 
-    tableHtml += '</tbody></table>';
-    resultsEl.innerHTML = cardHtml + tableHtml;
+    resultsEl.innerHTML = html;
+    resultsEl.scrollTop = 0;
     updatePager(total);
   }
 
   function updatePager(total) {
     document.getElementById('prevBtn').disabled = offset === 0;
     document.getElementById('nextBtn').disabled = (offset + limit) >= total;
-    document.getElementById('pageTxt').textContent = `Page ${Math.floor(offset/limit) + 1}`;
+    document.getElementById('pageTxt').textContent = `Halaman ${Math.floor(offset/limit) + 1}`;
   }
 
-  document.getElementById('prevBtn').onclick = () => { offset -= limit; renderUI(); };
-  document.getElementById('nextBtn').onclick = () => { offset += limit; renderUI(); };
+  document.getElementById('prevBtn').onclick = () => { offset -= limit; render(); };
+  document.getElementById('nextBtn').onclick = () => { offset += limit; render(); };
 </script>
 
 </body>
