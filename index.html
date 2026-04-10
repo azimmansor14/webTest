@@ -3,103 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Rekod MSBR & MSIC</title>
+  <title>MSBR & MSIC Explorer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   <style>
-    :root {
-      --primary: #3b82f6;
-      --bg: #0f172a;
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --card-border: rgba(255, 255, 255, 0.3);
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --radius: 20px;
-    }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-      color: var(--text-main);
-      background: var(--bg);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.2) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.2) 0px, transparent 50%);
-      background-attachment: fixed;
-      display: flex; justify-content: center; min-height: 100vh; padding: 16px;
-    }
-
+    /* ... (Keep your existing CSS from the previous design here) ... */
+    :root { --primary: #3b82f6; --bg: #0f172a; --card-bg: rgba(255, 255, 255, 0.9); --text-main: #1e293b; --text-muted: #64748b; --radius: 20px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: sans-serif; color: var(--text-main); background: var(--bg); display: flex; justify-content: center; padding: 16px; min-height: 100vh; }
     .shell { width: 100%; max-width: 1100px; }
-
-    header { margin-bottom: 24px; }
-    header h1 { color: white; margin: 0; font-size: 24px; font-weight: 800; }
-    header p { color: rgba(255,255,255,0.6); margin: 5px 0 0; font-size: 13px; }
-
-    .tab-container {
-      display: flex; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-      padding: 4px; border-radius: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .tab-btn {
-      flex: 1; padding: 12px; border: none; background: transparent; color: white;
-      font-weight: 600; font-size: 13px; cursor: pointer; border-radius: 10px; transition: 0.2s;
-    }
-
-    .tab-btn.active { background: var(--primary); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-
-    .card {
-      background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border);
-      border-radius: var(--radius); box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden;
-      display: flex; flex-direction: column;
-    }
-
-    .search-area { padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); background: white; }
-    input#q {
-      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1);
-      font-size: 16px; outline: none; transition: 0.2s;
-    }
-    input#q:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-
-    .status-bar {
-      display: flex; justify-content: space-between; padding: 10px 20px;
-      background: rgba(255,255,255,0.5); font-size: 12px; font-weight: 600; color: var(--text-muted);
-    }
-
-    #results { flex: 1; overflow: auto; max-height: 60vh; min-height: 250px; }
-
-    /* Card styling for Mobile */
-    .data-card {
-      padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.05); background: white; margin: 8px; border-radius: 12px;
-    }
-    .card-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
-    .card-val { font-size: 14px; margin-bottom: 8px; font-weight: 500; }
-    .card-title { color: var(--primary); font-weight: 700; font-size: 15px; margin-bottom: 10px; display: block; }
-
-    /* Table styling for Desktop */
-    @media (min-width: 768px) {
-      .data-card { display: none; }
-      table { width: 100%; border-collapse: collapse; display: table; background: white; }
-      th { position: sticky; top: 0; background: #f8fafc; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid #eee; z-index: 10; white-space: nowrap; }
-      td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
-      tr:hover td { background: #f8fafc; }
-    }
-
-    @media (max-width: 767px) { table { display: none; } }
-
-    .pager { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: white; border-top: 1px solid rgba(0,0,0,0.05); }
-    .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; font-weight: 600; cursor: pointer; }
-    .btn:disabled { opacity: 0.4; }
-
-    .spinner { width: 18px; height: 18px; border: 3px solid rgba(59, 130, 246, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    header h1 { color: white; margin: 0; }
+    header p { color: rgba(255,255,255,0.6); }
+    .tab-container { display: flex; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 14px; margin: 16px 0; }
+    .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: white; cursor: pointer; border-radius: 10px; font-weight: 600; }
+    .tab-btn.active { background: var(--primary); }
+    .card { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .search-area { padding: 20px; background: white; border-bottom: 1px solid #eee; }
+    input#q { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+    .status-bar { display: flex; justify-content: space-between; padding: 10px 20px; background: #f8fafc; font-size: 12px; }
+    #results { flex: 1; overflow: auto; max-height: 60vh; min-height: 300px; }
+    .data-card { padding: 15px; border-bottom: 1px solid #eee; background: white; }
+    .card-title { color: var(--primary); font-weight: 700; display: block; margin-bottom: 5px; }
+    .card-label { font-size: 10px; color: var(--text-muted); font-weight: 700; }
+    .card-val { font-size: 13px; margin-bottom: 5px; }
+    .pager { display: flex; justify-content: space-between; padding: 16px; background: white; align-items: center; }
+    .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; }
+    .spinner { width: 18px; height: 18px; border: 3px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @media (min-width: 768px) {
+      table { width: 100%; border-collapse: collapse; }
+      th { position: sticky; top: 0; background: #f8fafc; padding: 12px; text-align: left; font-size: 11px; border-bottom: 1px solid #eee; }
+      td { padding: 12px; font-size: 13px; border-bottom: 1px solid #eee; background: white; }
+      .data-card { display: none; }
+    }
+    @media (max-width: 767px) { table { display: none; } }
   </style>
 </head>
 <body>
 
 <div class="shell">
   <header>
-    <h1>Carian Data MSBR & MSIC</h1>
-    <p>DOSM Negeri Sembilan</p>
+    <h1>Carian MSBR & MSIC</h1>
+    <p>DOSM Negeri Sembilan (Serverless Version)</p>
   </header>
 
   <div class="tab-container">
@@ -109,19 +53,19 @@
 
   <div class="card">
     <div class="search-area">
-      <input type="text" id="q" placeholder="Carian Nama / No. Siri..." autocomplete="off">
+      <input type="text" id="q" placeholder="Sila tunggu, memuatkan data..." disabled autocomplete="off">
     </div>
 
     <div class="status-bar">
       <div style="display:flex; align-items:center; gap:8px;">
         <div class="spinner" id="loader"></div>
-        <span id="statusTxt">Ready</span>
+        <span id="statusTxt">Memuatkan CSV...</span>
       </div>
       <span id="countTxt">0 results</span>
     </div>
 
     <div id="results">
-      <div style="padding: 60px 20px; text-align: center; color: var(--text-muted);">Sila masukkan sekurang-kurangnya 2 aksara.</div>
+      <div style="padding: 60px 20px; text-align: center; color: var(--text-muted);">Sila tunggu sehingga data selesai dimuatkan.</div>
     </div>
 
     <div class="pager">
@@ -136,7 +80,10 @@
   let activeTab = 'msbr';
   let offset = 0;
   const limit = 20;
-  let timer;
+  
+  // Storage for the full datasets
+  let datasets = { msbr: null, msic: null };
+  let filteredData = [];
 
   const input = document.getElementById('q');
   const resultsEl = document.getElementById('results');
@@ -144,86 +91,105 @@
   const statusTxt = document.getElementById('statusTxt');
   const countTxt = document.getElementById('countTxt');
 
+  // 1. Initial Load: Fetch CSVs immediately
+  window.onload = () => {
+    loadCSV('msbr', 'newMSBR.csv');
+    loadCSV('msic', 'MSIC2008_2025.csv');
+  };
+
+  function loadCSV(type, filename) {
+    Papa.parse(filename, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        datasets[type] = results;
+        if (type === activeTab) {
+          input.disabled = false;
+          input.placeholder = "Carian Nama / No. Siri...";
+          statusTxt.textContent = "Data sedia.";
+        }
+      }
+    });
+  }
+
   function switchTab(tab) {
     if (activeTab === tab) return;
-    
-    // Reset Everything
     activeTab = tab;
     offset = 0;
     input.value = "";
     
-    // UI Update
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-'+tab).classList.add('active');
-    input.placeholder = tab === 'msbr' ? "Carian Nama / No. Siri..." : "Carian Kod MSIC / Deskripsi...";
     
-    // Reset Results View (Disappear)
+    // Reset View
     resultsEl.innerHTML = `<div style="padding: 60px 20px; text-align: center; color: var(--text-muted);">Masukkan carian baru untuk ${tab.toUpperCase()}.</div>`;
-    statusTxt.textContent = "Ready";
+    statusTxt.textContent = "Data sedia.";
     countTxt.textContent = "0 results";
     updatePager(0);
   }
 
   input.addEventListener('input', () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => { offset = 0; runSearch(); }, 500);
+    offset = 0;
+    runSearch();
   });
 
-  async function runSearch() {
-    const q = input.value.trim();
+  function runSearch() {
+    const q = input.value.trim().toLowerCase();
+    const data = datasets[activeTab];
+
+    if (!data) return;
     if (q.length < 2) {
-      statusTxt.textContent = "Ready";
+      filteredData = [];
+      renderUI();
       return;
     }
 
     loader.style.display = 'block';
-    statusTxt.textContent = "Searching...";
-    
-    const endpoint = activeTab === 'msbr' ? 'search.php' : 'search_msic.php';
-    
-    try {
-      const resp = await fetch(`${endpoint}?q=${encodeURIComponent(q)}&offset=${offset}&limit=${limit}`);
-      const data = await resp.json();
-      renderUI(data);
-    } catch (e) {
-      statusTxt.textContent = "Error";
-      resultsEl.innerHTML = `<div style="padding:40px; text-align:center; color:red;">Ralat sambungan ke ${endpoint}</div>`;
-    } finally {
-      loader.style.display = 'none';
-    }
+
+    // Perform Search in Browser
+    filteredData = data.data.filter(row => {
+      return Object.values(row).some(val => 
+        String(val).toLowerCase().includes(q)
+      );
+    });
+
+    renderUI();
+    loader.style.display = 'none';
   }
 
-  function renderUI(data) {
-    const { headers, rows, total } = data;
+  function renderUI() {
+    const total = filteredData.length;
     countTxt.textContent = `${total} results`;
-    statusTxt.textContent = total > 0 ? "Results loaded" : "Tiada padanan";
     
-    if (!rows || rows.length === 0) {
+    if (total === 0) {
       resultsEl.innerHTML = '<div style="padding:60px; text-align:center;">Tiada rekod dijumpai.</div>';
       updatePager(0);
       return;
     }
+
+    const rowsToShow = filteredData.slice(offset, offset + limit);
+    const headers = Object.keys(filteredData[0]);
 
     let cardHtml = '';
     let tableHtml = '<table><thead><tr>';
     headers.forEach(h => tableHtml += `<th>${h}</th>`);
     tableHtml += '</tr></thead><tbody>';
 
-    rows.forEach(row => {
+    rowsToShow.forEach(row => {
       tableHtml += '<tr>';
-      row.forEach(cell => tableHtml += `<td>${cell || '-'}</td>`);
+      headers.forEach(h => tableHtml += `<td>${row[h] || '-'}</td>`);
       tableHtml += '</tr>';
 
+      // Mobile Card Mapping
       cardHtml += `<div class="data-card">`;
       if (activeTab === 'msbr') {
-        cardHtml += `<span class="card-title">${row[5] || 'Tiada Nama'}</span>`;
-        cardHtml += `<div class="card-label">Siri</div><div class="card-val">${row[0]}</div>`;
-        cardHtml += `<div class="card-label">Perniagaan</div><div class="card-val">${row[6] || '-'}</div>`;
-        cardHtml += `<div class="card-label">Daerah</div><div class="card-val">${row[17] || '-'}</div>`;
+        cardHtml += `<span class="card-title">${row['Nama Pendaftaran'] || 'Tiada Nama'}</span>`;
+        cardHtml += `<div class="card-label">No. Siri</div><div class="card-val">${row['No. Siri']}</div>`;
+        cardHtml += `<div class="card-label">Daerah</div><div class="card-val">${row['Daerah Pentadbiran Tahunan'] || '-'}</div>`;
       } else {
-        cardHtml += `<span class="card-title">${row[2] || 'Kod'}</span>`;
-        cardHtml += `<div class="card-label">BM</div><div class="card-val">${row[3] || '-'}</div>`;
-        cardHtml += `<div class="card-label">EN</div><div class="card-val">${row[4] || '-'}</div>`;
+        cardHtml += `<span class="card-title">${row['MSIC 2025'] || row['MSIC 2008']}</span>`;
+        cardHtml += `<div class="card-label">Malay</div><div class="card-val">${row['MALAY DESCRIPTION FOR MSIC 2025'] || '-'}</div>`;
       }
       cardHtml += `</div>`;
     });
@@ -235,12 +201,12 @@
 
   function updatePager(total) {
     document.getElementById('prevBtn').disabled = offset === 0;
-    document.getElementById('nextBtn').disabled = (offset + limit) >= total || total === 0;
+    document.getElementById('nextBtn').disabled = (offset + limit) >= total;
     document.getElementById('pageTxt').textContent = `Page ${Math.floor(offset/limit) + 1}`;
   }
 
-  document.getElementById('prevBtn').onclick = () => { offset -= limit; runSearch(); };
-  document.getElementById('nextBtn').onclick = () => { offset += limit; runSearch(); };
+  document.getElementById('prevBtn').onclick = () => { offset -= limit; renderUI(); };
+  document.getElementById('nextBtn').onclick = () => { offset += limit; renderUI(); };
 </script>
 
 </body>
